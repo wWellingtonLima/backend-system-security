@@ -1,0 +1,102 @@
+package com.group1.gestao_seguranca.entities;
+
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Table(name = "funcionarios")
+public class Funcionarios {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_funcionario")
+    private int id;
+
+    @Column(nullable = false, length = 150)
+    private String nomeFuncionario;
+
+    @Column(nullable = false, length = 50)
+    private String setor;
+
+    private String createUser;
+    private LocalDateTime createDate;
+    private String modifyUser;
+    private LocalDateTime modifyDate;
+
+    @OneToMany(mappedBy = "funcionarioResponsavel", fetch = FetchType.LAZY)
+    private List<Visitas> visitasResponsavel;
+
+    public Funcionarios() {
+    }
+
+    public Funcionarios(String nomeFuncionario, String setor) {
+        this.nomeFuncionario = nomeFuncionario;
+        this.setor = setor;
+    }
+
+    public List<Visitas> getVisitasResponsavel() {
+        return visitasResponsavel;
+    }
+
+    public void setVisitasResponsavel(List<Visitas> visitasResponsavel) {
+        this.visitasResponsavel = visitasResponsavel;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getNomeFuncionario() {
+        return nomeFuncionario;
+    }
+
+    public void setNomeFuncionario(String nomeFuncionario) {
+        this.nomeFuncionario = nomeFuncionario;
+    }
+
+    public String getSetor() {
+        return setor;
+    }
+
+    public void setSetor(String setor) {
+        this.setor = setor;
+    }
+
+    public String getCreateUser() {
+        return createUser;
+    }
+
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser;
+    }
+
+    public LocalDateTime getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(LocalDateTime createDate) {
+        this.createDate = createDate;
+    }
+
+    public String getModifyUser() {
+        return modifyUser;
+    }
+
+    public void setModifyUser(String modifyUser) {
+        this.modifyUser = modifyUser;
+    }
+
+    public LocalDateTime getModifyDate() {
+        return modifyDate;
+    }
+
+    public void setModifyDate(LocalDateTime modifyDate) {
+        this.modifyDate = modifyDate;
+    }
+}
