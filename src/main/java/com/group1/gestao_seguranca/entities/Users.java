@@ -14,19 +14,22 @@ public class Users {
     @Column(name = "id_user")
     private int id;
 
-    @Column(nullable = false, length = 150)
+    @Column(name="nome_seguranca",nullable = false, length = 150)
     private String nomeSeguranca;
-    @Column(nullable = false, unique = true)
+    @Column(name="numero_seguranca", nullable = false, unique = true)
     private int numeroSeguranca;
     @Column(nullable = false, length = 30)
     private String password;
 
     @OneToMany(mappedBy = "seguranca", fetch = FetchType.LAZY)
     private List<Rondas> rondas;
-
+    @Column(name="create_user")
     private String createUser;
+    @Column(name="create_date")
     private LocalDateTime createDate;
+    @Column(name="modify_user")
     private String modifyUser;
+    @Column(name="modify_date")
     private LocalDateTime modifyDate;
 
     public Users() {

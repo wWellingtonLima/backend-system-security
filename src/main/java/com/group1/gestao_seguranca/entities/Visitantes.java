@@ -14,24 +14,28 @@ public class Visitantes {
     @Column(name = "id_visitante")
     private int id;
 
-    @Column(nullable = false, length = 150)
+    @Column(name = "nome_visitante", nullable = false, length = 150)
     private String nomeVisitante;
 
-    @Column(length = 100)
+    @Column(name = "empresa", length = 100)
     private String empresa;
 
-    @Column(nullable = false, length = 30)
+    @Column(name = "documento_identificacao", nullable = false, length = 30)
     private String documentoIdentificacao;
 
-    @Column(length = 100)
+    @Column(name = "setor_destino", length = 100)
     private String setorDestino;
 
     @OneToMany(mappedBy = "visitante", fetch = FetchType.LAZY)
     private List<Visitas> visitas;
 
+    @Column(name="create_user")
     private String createUser;
+    @Column(name="create_date")
     private LocalDateTime createDate;
+    @Column(name="modify_user")
     private String modifyUser;
+    @Column(name="modify_date")
     private LocalDateTime modifyDate;
 
     public Visitantes() {
