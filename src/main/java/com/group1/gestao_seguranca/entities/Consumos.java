@@ -18,18 +18,20 @@ public class Consumos {
 
     private LocalDateTime dataRegisto;
 
-    private String observacoes;
+    private String observacao;
 
     @Enumerated(EnumType.STRING)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_tipo_consumo", nullable = false)
     private TipoConsumo tipoConsumo;
 
-    @Column(name="create_user")
+    @Column(name = "create_user")
     private String createUser;
-    @Column(name="create_date")
+    @Column(name = "create_date")
     private LocalDateTime createDate;
-    @Column(name="modify_user")
+    @Column(name = "modify_user")
     private String modifyUser;
-    @Column(name="modify_date")
+    @Column(name = "modify_date")
     private LocalDateTime modifyDate;
 
     @PrePersist
@@ -42,12 +44,13 @@ public class Consumos {
         this.modifyDate = LocalDateTime.now();
     }
 
-    public Consumos(){}
+    public Consumos() {
+    }
 
-    public Consumos(int valorLeitura, LocalDateTime dataRegisto, String observacoes, TipoConsumo tipoConsumo) {
+    public Consumos(int valorLeitura, LocalDateTime dataRegisto, String observacao, TipoConsumo tipoConsumo) {
         this.valorLeitura = valorLeitura;
         this.dataRegisto = dataRegisto;
-        this.observacoes = observacoes;
+        this.observacao = observacao;
         this.tipoConsumo = tipoConsumo;
     }
 
@@ -76,11 +79,11 @@ public class Consumos {
     }
 
     public String getObservacoes() {
-        return observacoes;
+        return observacao;
     }
 
     public void setObservacoes(String observacoes) {
-        this.observacoes = observacoes;
+        this.observacao = observacao;
     }
 
     public TipoConsumo getTipoConsumo() {
@@ -122,9 +125,4 @@ public class Consumos {
     public void setModifyDate(LocalDateTime modifyDate) {
         this.modifyDate = modifyDate;
     }
-}
-
-
-enum TipoConsumo {
-    AGUA, LUZ, GAS
 }
