@@ -26,10 +26,14 @@ public class Chaves {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_sala", nullable = false)
-    private Salas chaveDaSala;
+    private Salas sala;
 
     @OneToMany(mappedBy = "chave", fetch = FetchType.LAZY)
     private List<EntregaChaves> emprestimosDeChaves;
+
+    // Mostra o historico de entregas de uma chave
+    @OneToMany(mappedBy = "chave", fetch = FetchType.LAZY)
+    private List<EntregaChaves> historicoEntregas;
 
     @Column(name = "create_user")
     private String createUser;
@@ -39,10 +43,6 @@ public class Chaves {
     private String modifyUser;
     @Column(name = "modify_date")
     private LocalDateTime modifyDate;
-
-    // Mostra o historico de entregas de uma chave
-    @OneToMany(mappedBy = "chave", fetch = FetchType.LAZY)
-    private List<EntregaChaves> historicoEntregas;
 
     @PrePersist
     protected void onCreate() {
@@ -55,6 +55,13 @@ public class Chaves {
     }
 
     public Chaves() {
+    }
+
+    public Chaves(String codigoChave, StatusChave statusChave, TipoChave tipoChave, Salas sala) {
+        this.codigoChave = codigoChave;
+        this.statusChave = statusChave;
+        this.tipoChave = tipoChave;
+        this.sala = sala;
     }
 
     public int getId() {
@@ -71,6 +78,14 @@ public class Chaves {
 
     public void setEmprestimosDeChaves(List<EntregaChaves> emprestimosDeChaves) {
         this.emprestimosDeChaves = emprestimosDeChaves;
+    }
+
+    public Salas getSala() {
+        return sala;
+    }
+
+    public void setSala(Salas sala) {
+        this.sala = sala;
     }
 
     public String getCodigoChave() {

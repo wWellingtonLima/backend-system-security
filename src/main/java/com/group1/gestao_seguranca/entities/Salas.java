@@ -23,16 +23,20 @@ public class Salas {
     @OneToMany(mappedBy = "sala", fetch = FetchType.LAZY)
     private List<Chaves> chaves;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_sala", nullable = false)
-    private Salas sala;
-
     public Salas() {
     }
 
     public Salas(int numeroSala, Piso piso) {
         this.numeroSala = numeroSala;
         this.piso = piso;
+    }
+
+    public List<Chaves> getChaves() {
+        return chaves;
+    }
+
+    public void setChaves(List<Chaves> chaves) {
+        this.chaves = chaves;
     }
 
     public int getId() {

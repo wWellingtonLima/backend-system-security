@@ -15,7 +15,7 @@ public class Ocorrencias {
     @Column(name = "hora_ocorrencia")
     private LocalDateTime horaOcorrencia;
 
-    private String observacao;
+    private String ocorrencia;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user", nullable = false)
@@ -43,9 +43,9 @@ public class Ocorrencias {
     public Ocorrencias() {
     }
 
-    public Ocorrencias(LocalDateTime horaOcorrencia, String observacao, Users seguranca) {
+    public Ocorrencias(LocalDateTime horaOcorrencia, String ocorrencia, Users seguranca) {
         this.horaOcorrencia = horaOcorrencia;
-        this.observacao = observacao;
+        this.ocorrencia = ocorrencia;
         this.seguranca = seguranca;
     }
 

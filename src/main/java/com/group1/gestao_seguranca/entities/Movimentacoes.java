@@ -3,6 +3,7 @@ package com.group1.gestao_seguranca.entities;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "movimentacoes")
@@ -25,17 +26,16 @@ public class Movimentacoes {
     @JoinColumn(name = "id_visita")
     private Visitas visita;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_entrega")
-    private EntregaChaves entregaChave;
+    @OneToMany(mappedBy = "movimentacao", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    private List<EntregaChaves> entregas;
 
-    @Column(name="create_user")
+    @Column(name = "create_user")
     private String createUser;
-    @Column(name="create_date")
+    @Column(name = "create_date")
     private LocalDateTime createDate;
-    @Column(name="modify_user")
+    @Column(name = "modify_user")
     private String modifyUser;
-    @Column(name="modify_date")
+    @Column(name = "modify_date")
     private LocalDateTime modifyDate;
 
     @PrePersist
@@ -58,27 +58,11 @@ public class Movimentacoes {
         this.funcionario = funcionario;
     }
 
-    public Movimentacoes(LocalDateTime horaEntrada, LocalDateTime horaSaida, String observacoes, Funcionarios funcionario, EntregaChaves entregaChave) {
-        this.horaEntrada = horaEntrada;
-        this.horaSaida = horaSaida;
-        this.observacoes = observacoes;
-        this.funcionario = funcionario;
-        this.entregaChave = entregaChave;
-    }
-
     public Movimentacoes(LocalDateTime horaEntrada, LocalDateTime horaSaida, String observacoes, Visitas visita) {
         this.horaEntrada = horaEntrada;
         this.horaSaida = horaSaida;
         this.observacoes = observacoes;
         this.visita = visita;
-    }
-
-    public Movimentacoes(LocalDateTime horaEntrada, LocalDateTime horaSaida, String observacoes, Visitas visita, EntregaChaves entregaChave) {
-        this.horaEntrada = horaEntrada;
-        this.horaSaida = horaSaida;
-        this.observacoes = observacoes;
-        this.visita = visita;
-        this.entregaChave = entregaChave;
     }
 
     public int getId() {
@@ -127,14 +111,6 @@ public class Movimentacoes {
 
     public void setVisita(Visitas visita) {
         this.visita = visita;
-    }
-
-    public EntregaChaves getEntregaChave() {
-        return entregaChave;
-    }
-
-    public void setEntregaChave(EntregaChaves entregaChave) {
-        this.entregaChave = entregaChave;
     }
 
     public String getCreateUser() {

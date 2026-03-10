@@ -20,14 +20,9 @@ public class EntregaChaves {
     @JoinColumn(name = "id_chave", nullable = false)
     private Chaves chave;
 
-    @Column(name="create_user")
-    private String createUser;
-    @Column(name="create_date")
-    private LocalDateTime createDate;
-    @Column(name="modify_user")
-    private String modifyUser;
-    @Column(name="modify_date")
-    private LocalDateTime modifyDate;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_movimentacao", nullable = false)
+    private Movimentacoes movimentacao;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_funcionario")
@@ -36,6 +31,15 @@ public class EntregaChaves {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_visita")
     private Visitas visitaComChave;
+
+    @Column(name="create_user")
+    private String createUser;
+    @Column(name="create_date")
+    private LocalDateTime createDate;
+    @Column(name="modify_user")
+    private String modifyUser;
+    @Column(name="modify_date")
+    private LocalDateTime modifyDate;
 
     @PrePersist
     protected void onCreate() {
