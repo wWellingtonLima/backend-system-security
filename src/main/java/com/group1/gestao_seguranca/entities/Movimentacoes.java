@@ -16,10 +16,7 @@ public class Movimentacoes {
 
     @Column(name = "hora_entrada")
     private LocalDateTime horaEntrada;
-<<<<<<< HEAD
-=======
 
->>>>>>> 1bc7bf1 (adiciona camada de services, cria DTO para Login e Register e Metodos JPA)
     @Column(name = "hora_saida")
     private LocalDateTime horaSaida;
     private String observacoes;
