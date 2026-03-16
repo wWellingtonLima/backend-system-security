@@ -1,10 +1,11 @@
 package com.group1.gestao_seguranca.dto.auth;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class LoginRequestDTO {
 
-    @NotBlank(message = "Número do segurança é obrigatório")
+    @NotNull(message = "Número do segurança é obrigatório")
     private Integer numeroSeguranca;
     @NotBlank(message = "Palavra-passe é obrigatória")
     private String password;
