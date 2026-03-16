@@ -41,8 +41,8 @@ public class EntregaChaves {
     private Funcionarios funcionarioComChave;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_visita")
-    private Visitas visitaComChave;
+    @JoinColumn(name = "id_visitante")
+    private Visitantes visitanteComChave;
 
     @Column(name = "create_user")
     private String createUser;
@@ -111,12 +111,12 @@ public class EntregaChaves {
         this.funcionarioComChave = funcionarioComChave;
     }
 
-    public Visitas getVisitaComChave() {
-        return visitaComChave;
+    public Visitantes getVisitanteComChave() {
+        return visitanteComChave;
     }
 
-    public void setVisitaComChave(Visitas visitaComChave) {
-        this.visitaComChave = visitaComChave;
+    public void setVisitanteComChave(Visitantes visitanteComChave) {
+        this.visitanteComChave = visitanteComChave;
     }
 
     public int getId() {
