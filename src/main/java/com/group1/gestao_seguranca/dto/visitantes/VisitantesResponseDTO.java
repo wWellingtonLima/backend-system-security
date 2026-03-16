@@ -9,10 +9,7 @@ public class VisitantesResponseDTO {
     private String nomeVisitante;
     private String documentoIdentificacao;
     private String empresa;
-    private String setorDestino;
-    private TipoVisitanteEnum tipoVisitante;
     private String observacoes;
-    private String nomeFuncionarioResponsavel; //So o nome
 
     public static VisitantesResponseDTO from(Visitantes v) {
         VisitantesResponseDTO dto = new VisitantesResponseDTO();
@@ -20,13 +17,7 @@ public class VisitantesResponseDTO {
         dto.nomeVisitante = v.getNomeVisitante();
         dto.documentoIdentificacao = v.getDocumentoIdentificacao();
         dto.empresa = v.getEmpresa();
-        dto.setorDestino = v.getSetorDestino();
-        dto.tipoVisitante = v.getTipoVisitante();
         dto.observacoes = v.getObservacoes();
-
-        if (v.getFuncionarioResponsavel() != null) {
-            dto.nomeFuncionarioResponsavel = v.getFuncionarioResponsavel().getNomeFuncionario();
-        }
 
         return dto;
     }
@@ -48,19 +39,8 @@ public class VisitantesResponseDTO {
         return empresa;
     }
 
-    public String getSetorDestino() {
-        return setorDestino;
-    }
-
-    public TipoVisitanteEnum getTipoVisita() {
-        return tipoVisitante;
-    }
-
     public String getObservacoes() {
         return observacoes;
     }
 
-    public String getNomeFuncionarioResponsavel() {
-        return nomeFuncionarioResponsavel;
-    }
 }

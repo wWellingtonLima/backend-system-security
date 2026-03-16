@@ -2,7 +2,6 @@ package com.group1.gestao_seguranca.entities;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -14,33 +13,16 @@ public class Visitantes extends Pessoa {
     @Column(name = "empresa", length = 100)
     private String empresa;
 
-    @Column(name = "documento_identificacao", nullable = false, length = 30)
+    @Column(name = "documento_identificacao", unique = true, nullable = false, length = 30)
     private String documentoIdentificacao;
 
-    @Column(name = "setor_destino", length = 100)
-    private String setorDestino;
+    private String observacoes;
 
     @OneToMany(mappedBy = "visitante", fetch = FetchType.LAZY)
-    private List<Visitas> visitas;
+    private List<Movimentacoes> movimentacoes;
 
-    @Column(name="create_user")
-    private String createUser;
-    @Column(name="create_date")
-    private LocalDateTime createDate;
-    @Column(name="modify_user")
-    private String modifyUser;
-    @Column(name="modify_date")
-    private LocalDateTime modifyDate;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createDate = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.modifyDate = LocalDateTime.now();
-    }
+    @OneToMany(mappedBy = "visitanteComChave", fetch = FetchType.LAZY)
+    private List<EntregaChaves> chavesRecebidas;
 
     public Visitantes() {
     }
@@ -54,23 +36,22 @@ public class Visitantes extends Pessoa {
         this.nomeVisitante = nomeVisitante;
         this.empresa = empresa;
         this.documentoIdentificacao = documentoIdentificacao;
-        this.setorDestino = setorDestino;
     }
 
-    public List<Visitas> getVisitas() {
-        return visitas;
+    public List<Movimentacoes> getMovimentacoes() {
+        return movimentacoes;
     }
 
-    public void setVisitas(List<Visitas> visitas) {
-        this.visitas = visitas;
+    public void setMovimentacoes(List<Movimentacoes> movimentacoes) {
+        this.movimentacoes = movimentacoes;
     }
 
-    public int getId() {
-        return id;
+    public List<EntregaChaves> getChavesRecebidas() {
+        return chavesRecebidas;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setChavesRecebidas(List<EntregaChaves> chavesRecebidas) {
+        this.chavesRecebidas = chavesRecebidas;
     }
 
     public String getNomeVisitante() {
@@ -79,6 +60,14 @@ public class Visitantes extends Pessoa {
 
     public void setNomeVisitante(String nomeVisitante) {
         this.nomeVisitante = nomeVisitante;
+    }
+
+    public String getObservacoes() {
+        return observacoes;
+    }
+
+    public void setObservacoes(String observacoes) {
+        this.observacoes = observacoes;
     }
 
     public String getEmpresa() {
@@ -97,43 +86,4 @@ public class Visitantes extends Pessoa {
         this.documentoIdentificacao = documentoIdentificacao;
     }
 
-    public String getSetorDestino() {
-        return setorDestino;
-    }
-
-    public void setSetorDestino(String setorDestino) {
-        this.setorDestino = setorDestino;
-    }
-
-    public String getCreateUser() {
-        return createUser;
-    }
-
-    public void setCreateUser(String createUser) {
-        this.createUser = createUser;
-    }
-
-    public LocalDateTime getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(LocalDateTime createDate) {
-        this.createDate = createDate;
-    }
-
-    public String getModifyUser() {
-        return modifyUser;
-    }
-
-    public void setModifyUser(String modifyUser) {
-        this.modifyUser = modifyUser;
-    }
-
-    public LocalDateTime getModifyDate() {
-        return modifyDate;
-    }
-
-    public void setModifyDate(LocalDateTime modifyDate) {
-        this.modifyDate = modifyDate;
-    }
 }
