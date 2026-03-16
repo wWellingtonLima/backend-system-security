@@ -5,7 +5,8 @@ public enum TipoVisitaEnum implements LabeledEnum {
     ENTREGA("Entrega"),
     MANUTENCAO("Manutenção"),
     REUNIAO("Reunião"),
-    SERVICO("Serviço");
+    SERVICO("Serviço"),
+    OUTRO("Outro");
 
     private final String label;
 
