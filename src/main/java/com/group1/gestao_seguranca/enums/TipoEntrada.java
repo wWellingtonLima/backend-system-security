@@ -1,4 +1,5 @@
 package com.group1.gestao_seguranca.enums;
 
-public enum TipoVisita {
+public enum TipoEntrada {
+    FUNCIONARIO, VISITANTE
 }

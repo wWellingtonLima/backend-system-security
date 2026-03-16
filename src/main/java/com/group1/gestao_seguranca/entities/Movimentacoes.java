@@ -1,5 +1,7 @@
 package com.group1.gestao_seguranca.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.group1.gestao_seguranca.enums.TipoVisitanteEnum;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -26,9 +28,18 @@ public class Movimentacoes {
     private Funcionarios funcionario;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_visita")
-    private Visitas visita;
+    @JoinColumn(name = "id_visitante")
+    private Visitantes visitante;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_visitante")
+    private TipoVisitanteEnum tipoVisitante;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_funcionario_responsavel")
+    private Funcionarios funcionarioResponsavel;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "movimentacao", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<EntregaChaves> entregas;
 
@@ -54,16 +65,48 @@ public class Movimentacoes {
     public Movimentacoes() {
     }
 
+    public Movimentacoes(LocalDateTime horaEntrada, String observacoes, Visitantes visitante) {
+        this.horaEntrada = horaEntrada;
+        this.observacoes = observacoes;
+        this.visitante = visitante;
+    }
+
     public Movimentacoes(LocalDateTime horaEntrada, String observacoes, Funcionarios funcionario) {
         this.horaEntrada = horaEntrada;
         this.observacoes = observacoes;
         this.funcionario = funcionario;
     }
 
-    public Movimentacoes(LocalDateTime horaEntrada, String observacoes, Visitas visita) {
-        this.horaEntrada = horaEntrada;
-        this.observacoes = observacoes;
-        this.visita = visita;
+    public TipoVisitanteEnum getTipoVisitante() {
+        return tipoVisitante;
+    }
+
+    public void setTipoVisitante(TipoVisitanteEnum tipoVisitante) {
+        this.tipoVisitante = tipoVisitante;
+    }
+
+    public Funcionarios getFuncionarioResponsavel() {
+        return funcionarioResponsavel;
+    }
+
+    public void setFuncionarioResponsavel(Funcionarios funcionarioResponsavel) {
+        this.funcionarioResponsavel = funcionarioResponsavel;
+    }
+
+    public List<EntregaChaves> getEntregas() {
+        return entregas;
+    }
+
+    public void setEntregas(List<EntregaChaves> entregas) {
+        this.entregas = entregas;
+    }
+
+    public Visitantes getVisitante() {
+        return visitante;
+    }
+
+    public void setVisitante(Visitantes visitante) {
+        this.visitante = visitante;
     }
 
     public int getId() {
@@ -106,13 +149,6 @@ public class Movimentacoes {
         this.funcionario = funcionario;
     }
 
-    public Visitas getVisita() {
-        return visita;
-    }
-
-    public void setVisita(Visitas visita) {
-        this.visita = visita;
-    }
 
     public String getCreateUser() {
         return createUser;
