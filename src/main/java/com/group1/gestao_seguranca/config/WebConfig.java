@@ -18,8 +18,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(sessaoInterceptor)
                 .addPathPatterns("/api/**") // vai proteger tudo com ssa rota
                 .excludePathPatterns(       // menos essas rotas aqui
-                        "/api/auth/login",
-                        "/api/auth/register",
+                        "/api/auth/**",
                         "/api/lists/**"
                 );
     }
