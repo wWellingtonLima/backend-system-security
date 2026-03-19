@@ -1,5 +1,6 @@
 package com.group1.gestao_seguranca.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ public class Users {
     private List<Ocorrencias> ocorrencias;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Sessao> sessoes;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
