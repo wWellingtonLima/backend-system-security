@@ -367,6 +367,7 @@ Um utilizador mal-intencionado ao descobrir que o id da sessão que é retornado
 - Cadastro Funcionario Permite enviar numero como parâmetro de setor e o sistema o salva como string.
 - Criação de Movimentações não verifica o tipo de documento. Aceita qualquer valor.
 - Sessão não tem tempo de expiração no Backend (no front vai ser SessionStorage).
+- Em nenhum dos locais existe uma Sanitização (Limpeza) dos dados recebidos do Frontend.
 
 
 # Para fazer: 
@@ -375,6 +376,7 @@ Um utilizador mal-intencionado ao descobrir que o id da sessão que é retornado
 - Fazer algo com o Tipo Chave (Principal, Reserva)
 - Analisar adição de @Transactional em algumas operações no ConsumosService 
 - Enviar campo "Criado em" na Lista Funcionarios
+- Talvez remover o campo "observacoes" do registo de Funcionarios e Visitantes
 
 # Links de Apoio
 > Interceptors
