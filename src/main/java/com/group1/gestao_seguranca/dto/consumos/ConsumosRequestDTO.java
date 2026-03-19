@@ -6,16 +6,14 @@ public class ConsumosRequestDTO {
     private Integer valorLeitura;
     private String observacao;
     private TipoConsumoEnum tipoConsumo;
-    private String createUser;
 
     public ConsumosRequestDTO() {
     }
 
-    public ConsumosRequestDTO(Integer valorLeitura, String observacao, TipoConsumoEnum tipoConsumo, String createUser) {
+    public ConsumosRequestDTO(Integer valorLeitura, String observacao, TipoConsumoEnum tipoConsumo) {
         this.valorLeitura = valorLeitura;
         this.observacao = observacao;
         this.tipoConsumo = tipoConsumo;
-        this.createUser = createUser;
     }
 
     public Integer getValorLeitura() {
@@ -40,13 +38,5 @@ public class ConsumosRequestDTO {
 
     public void setTipoConsumo(TipoConsumoEnum tipoConsumo) {
         this.tipoConsumo = tipoConsumo;
-    }
-
-    public String getCreateUser() {
-        return createUser;
-    }
-
-    public void setCreateUser(String createUser) {
-        this.createUser = createUser;
     }
 }
