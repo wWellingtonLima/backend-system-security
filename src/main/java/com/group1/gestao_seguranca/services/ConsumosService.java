@@ -2,9 +2,11 @@ package com.group1.gestao_seguranca.services;
 
 import com.group1.gestao_seguranca.dto.consumos.ConsumosRequestDTO;
 import com.group1.gestao_seguranca.dto.consumos.ConsumosResponseDTO;
+import com.group1.gestao_seguranca.dto.consumos.ConsumosUltimasLeiturasDTO;
 import com.group1.gestao_seguranca.entities.Consumos;
 import com.group1.gestao_seguranca.entities.TipoConsumo;
 import com.group1.gestao_seguranca.entities.Users;
+import com.group1.gestao_seguranca.enums.TipoConsumoEnum;
 import com.group1.gestao_seguranca.repositories.ConsumosRepository;
 import com.group1.gestao_seguranca.repositories.TipoConsumoRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,11 +33,40 @@ public class ConsumosService {
         this.tipoConsumoRepo = tipoConsumoRepo;
     }
 
+    private Integer calcularConsumo(Consumos consumo) {
+        return consumosRepo
+                .findAnteriorByTipo(
+                        consumo.getTipoConsumo().getTipoConsumo(),
+                        consumo.getDataRegisto()
+                )
+                .map(anterior -> consumo.getValorLeitura() - anterior.getValorLeitura())
+                .orElse(null);
+    }
+
     public List<ConsumosResponseDTO> listConsumos() {
-        return consumosRepo.findAll()
+        return consumosRepo.findByAtivoTrue()
                 .stream()
-                .map(ConsumosResponseDTO::from)
+                .map(consumo -> ConsumosResponseDTO.from(consumo, calcularConsumo(consumo)))
                 .toList();
+    }
+
+    public ConsumosUltimasLeiturasDTO getUltimasLeituras() {
+        Integer agua = consumosRepo
+                .findUltimaLeituraByTipo(TipoConsumoEnum.AGUA)
+                .map(Consumos::getValorLeitura)
+                .orElse(null);
+
+        Integer eletricidade = consumosRepo
+                .findUltimaLeituraByTipo(TipoConsumoEnum.ELETRICIDADE)
+                .map(Consumos::getValorLeitura)
+                .orElse(null);
+
+        Integer gas = consumosRepo
+                .findUltimaLeituraByTipo(TipoConsumoEnum.GAS)
+                .map(Consumos::getValorLeitura)
+                .orElse(null);
+
+        return new ConsumosUltimasLeiturasDTO(agua, eletricidade, gas);
     }
 
     public ConsumosResponseDTO searchById(Integer id) {
@@ -50,23 +81,16 @@ public class ConsumosService {
         TipoConsumo tipoConsumo = tipoConsumoRepo.findByTipoConsumo(dto.getTipoConsumo())
                 .orElseThrow(() -> new RuntimeException("Tipo de consumo não encontrado."));
 
-        Optional<Consumos> ultimaLeitura = consumosRepo
-                .findTopByTipoConsumoAndAtivoTrueOrderByDataRegistoDesc(tipoConsumo);
-
         Consumos consumo = new Consumos();
         consumo.setValorLeitura(dto.getValorLeitura());
         consumo.setDataRegisto(LocalDateTime.now());
         consumo.setObservacao(dto.getObservacao());
         consumo.setTipoConsumo(tipoConsumo);
         consumo.setUser(user);
-        consumo.setCreateUser(dto.getCreateUser());
+        consumo.setCreateUser(user.getCreateUser());
         consumosRepo.save(consumo);
 
-        Integer consumoCalculado = ultimaLeitura
-                .map(ultima -> consumo.getValorLeitura() - ultima.getValorLeitura())
-                .orElse(null);
-
-        return ConsumosResponseDTO.from(consumo, consumoCalculado);
+        return ConsumosResponseDTO.from(consumo);
     }
 
     public ConsumosResponseDTO updateConsumo(Integer id, ConsumosRequestDTO dto) {

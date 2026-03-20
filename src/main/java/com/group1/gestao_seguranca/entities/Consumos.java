@@ -1,6 +1,7 @@
 package com.group1.gestao_seguranca.entities;
 
 import com.fasterxml.jackson.annotation.*;
+import com.group1.gestao_seguranca.enums.TipoConsumoEnum;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -117,6 +118,10 @@ public class Consumos {
 
     public TipoConsumo getTipoConsumo() {
         return tipoConsumo;
+    }
+
+    public TipoConsumoEnum getTipoConsumoEnum() {
+        return tipoConsumo.getTipoConsumo();
     }
 
     public void setTipoConsumo(TipoConsumo tipoConsumo) {

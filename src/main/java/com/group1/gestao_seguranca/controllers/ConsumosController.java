@@ -2,6 +2,7 @@ package com.group1.gestao_seguranca.controllers;
 
 import com.group1.gestao_seguranca.dto.consumos.ConsumosRequestDTO;
 import com.group1.gestao_seguranca.dto.consumos.ConsumosResponseDTO;
+import com.group1.gestao_seguranca.dto.consumos.ConsumosUltimasLeiturasDTO;
 import com.group1.gestao_seguranca.services.ConsumosService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,11 @@ public class ConsumosController {
 
     public ConsumosController(ConsumosService consumosService) {
         this.service = consumosService;
+    }
+
+    @GetMapping("/ultimas-leituras")
+    public ResponseEntity<ConsumosUltimasLeiturasDTO> ultimasLeituras() {
+        return ResponseEntity.ok(service.getUltimasLeituras());
     }
 
     @GetMapping

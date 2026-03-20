@@ -18,15 +18,11 @@ public class TipoConsumo {
     @Column(name = "tipo")
     private TipoConsumoEnum tipoConsumo;
 
-    @OneToMany(mappedBy = "tipoConsumo", fetch = FetchType.LAZY)
-    private List<Consumos> consumos;
-
     public TipoConsumo() {
     }
 
-    public TipoConsumo(TipoConsumoEnum tipoConsumo, List<Consumos> consumos) {
+    public TipoConsumo(TipoConsumoEnum tipoConsumo) {
         this.tipoConsumo = tipoConsumo;
-        this.consumos = consumos;
     }
 
     public TipoConsumoEnum getTipoConsumo() {
@@ -47,13 +43,5 @@ public class TipoConsumo {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public List<Consumos> getConsumos() {
-        return consumos;
-    }
-
-    public void setConsumos(List<Consumos> consumos) {
-        this.consumos = consumos;
     }
 }
