@@ -1,0 +1,19 @@
+package com.group1.gestao_seguranca.dto.visitantes;
+
+import com.group1.gestao_seguranca.entities.Visitantes;
+
+public record VisitanteBuscaDTO(
+        Integer id,
+        String nomeVisitante,
+        String empresa,
+        String documentoIdentificacao
+) {
+    public static VisitanteBuscaDTO from(Visitantes v) {
+        return new VisitanteBuscaDTO(
+                v.getId(),
+                v.getNomeVisitante(),
+                v.getEmpresa(),
+                v.getDocumentoIdentificacao()
+        );
+    }
+}
