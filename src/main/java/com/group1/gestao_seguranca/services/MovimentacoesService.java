@@ -16,6 +16,7 @@ import java.util.List;
 
 @Service
 public class MovimentacoesService {
+
     private final HttpServletRequest request;
     private final MovimentacoesRepository movimentacoesRepo;
     private final FuncionariosRepository funcionariosRepo;
@@ -23,14 +24,27 @@ public class MovimentacoesService {
     private final ChavesRepository chavesRepo;
     private final EntregaChavesRepository entregaChavesRepo;
 
-    public MovimentacoesService(HttpServletRequest request, MovimentacoesRepository movimentacoesRepo, FuncionariosRepository funcionariosRepo, VisitantesRepository visitantesRepo, ChavesRepository chavesRepo, EntregaChavesRepository entregaChavesRepo) {
-        this.request = request;
-        this.movimentacoesRepo = movimentacoesRepo;
-        this.funcionariosRepo = funcionariosRepo;
-        this.visitantesRepo = visitantesRepo;
-        this.chavesRepo = chavesRepo;
-        this.entregaChavesRepo = entregaChavesRepo;
+    public MovimentacoesService(HttpServletRequest request,
+                                MovimentacoesRepository movimentacoesRepo,
+                                FuncionariosRepository funcionariosRepo,
+                                VisitantesRepository visitantesRepo,
+                                ChavesRepository chavesRepo,
+                                EntregaChavesRepository entregaChavesRepo) {
+        this.request            = request;
+        this.movimentacoesRepo  = movimentacoesRepo;
+        this.funcionariosRepo   = funcionariosRepo;
+        this.visitantesRepo     = visitantesRepo;
+        this.chavesRepo         = chavesRepo;
+        this.entregaChavesRepo  = entregaChavesRepo;
     }
+
+    private Users getUserAutenticado() {
+        return (Users) request.getAttribute("usuarioAutenticado");
+    }
+
+    // ─────────────────────────────────────────────
+    // CRUD existente
+    // ─────────────────────────────────────────────
 
     @Transactional
     public MovimentacaoResponseDTO registrarEntrada(MovimentacaoRequestDTO dto) {
@@ -46,9 +60,9 @@ public class MovimentacoesService {
             Funcionarios func = funcionariosRepo.findById(dto.getIdFuncionario())
                     .orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado."));
 
-            if (movimentacoesRepo.existeEntradaAtiva(func.getId())) {
-                throw new IllegalStateException("O funcionário " + func.getNomeFuncionario() + " já possui uma entrada ativa.");
-            }
+            if (movimentacoesRepo.existeEntradaAtiva(func.getId()))
+                throw new IllegalStateException(
+                        "O funcionário " + func.getNomeFuncionario() + " já possui uma entrada ativa.");
 
             movimentacao.setSetorDestino(func.getSetor());
             movimentacao.setFuncionario(func);
@@ -56,15 +70,14 @@ public class MovimentacoesService {
             Visitantes visitante = visitantesRepo.findById(dto.getIdVisitante())
                     .orElseThrow(() -> new EntityNotFoundException("Visitante não encontrado."));
 
-            if (movimentacoesRepo.existeEntradaAtivaVisitante(visitante.getId())) {
-                throw new IllegalStateException("O visitante " + visitante.getNomeVisitante() + " já possui uma entrada ativa.");
-            }
+            if (movimentacoesRepo.existeEntradaAtivaVisitante(visitante.getId()))
+                throw new IllegalStateException(
+                        "O visitante " + visitante.getNomeVisitante() + " já possui uma entrada ativa.");
 
             movimentacao.setVisitante(visitante);
             movimentacao.setTipoVisitante(dto.getTipoVisita());
             movimentacao.setSetorDestino(dto.getSetorDestino());
 
-            //Funciorio responsavel opcional
             if (dto.getIdFuncionarioResponsavel() != null) {
                 Funcionarios responsavel = funcionariosRepo
                         .findById(dto.getIdFuncionarioResponsavel())
@@ -72,73 +85,64 @@ public class MovimentacoesService {
                 movimentacao.setFuncionarioResponsavel(responsavel);
             }
         }
+
         movimentacao = movimentacoesRepo.save(movimentacao);
 
-        if (dto.getEntregaChave() != null) {
+        if (dto.getEntregaChave() != null)
             registrarEntregaChave(dto.getEntregaChave(), movimentacao);
-        }
 
         return MovimentacaoResponseDTO.from(movimentacao);
     }
-
 
     @Transactional
     public MovimentacaoResponseDTO registrarSaida(int idMovimentacao) {
         Movimentacoes movimentacao = movimentacoesRepo.findById(idMovimentacao)
                 .orElseThrow(() -> new EntityNotFoundException("Movimentação não encontrada"));
 
-        if (movimentacao.getHoraSaida() != null) {
+        if (movimentacao.getHoraSaida() != null)
             throw new IllegalStateException("Uma saída já foi registrada para esta movimentação");
-        }
+
+        if (!movimentacao.isAtivo())
+            throw new IllegalStateException("Não é possível registar saída numa movimentação anulada.");
 
         movimentacao.setHoraSaida(LocalDateTime.now());
         movimentacoesRepo.save(movimentacao);
 
-        // Aqui verifica se existem pendencias de chaves mas nao bloqueia a saida
-        List<EntregaChaves> pendentes = entregaChavesRepo.findByMovimentacaoAndHoraDevolucaoIsNull(movimentacao);
+        List<EntregaChaves> pendentes = entregaChavesRepo
+                .findByMovimentacaoAndHoraDevolucaoIsNull(movimentacao);
 
-        if (pendentes.isEmpty()) {
+        if (pendentes.isEmpty())
             return new MovimentacaoResponseDTO(movimentacao);
-        }
 
         List<EntregaPendenteDTO> pendentesDTO = pendentes.stream()
-                .map(entregasChave -> {
-                    TipoChaveEnum tipo = entregasChave.getChave().getTipoChave();
-                    String descricao;
-
-                    // Verifica de qual tipo e a chave para colocar a descricao adequada
-                    if (tipo == TipoChaveEnum.CHAVE) {
-                        descricao = entregasChave.getChave().getCodigoChave();
-                    } else {
-                        descricao = entregasChave.getChave().getCodigoMolho();
-                    }
-
-                    return new EntregaPendenteDTO(entregasChave.getId(), descricao, tipo, entregasChave.getObservacoes());
+                .map(e -> {
+                    TipoChaveEnum tipo = e.getChave().getTipoChave();
+                    String descricao = tipo == TipoChaveEnum.CHAVE
+                            ? e.getChave().getCodigoChave()
+                            : e.getChave().getCodigoMolho();
+                    return new EntregaPendenteDTO(e.getId(), descricao, tipo, e.getObservacoes());
                 })
                 .toList();
 
         return new MovimentacaoResponseDTO(
                 movimentacao,
-                "Saída registada com " + pendentes.size() + " chave(s)/molho(s) por devolver." + "Por favor, fazer os apontamentos necessários.",
+                "Saída registada com " + pendentes.size() + " chave(s)/molho(s) por devolver. Por favor, fazer os apontamentos necessários.",
                 pendentesDTO
         );
     }
 
     @Transactional
     public DevolucaoResponseDTO registrarDevolucao(int idEntrega, String devolvidaPor) {
-
         EntregaChaves entrega = entregaChavesRepo.findById(idEntrega)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Entrega de chave não encontrada: id=" + idEntrega));
 
-        if (entrega.getHoraDevolucao() != null) {
+        if (entrega.getHoraDevolucao() != null)
             throw new IllegalStateException("Esta chave/molho já foi devolvido.");
-        }
 
         entrega.setHoraDevolucao(LocalDateTime.now());
         entrega.setDevolvidaPor(devolvidaPor);
 
-        // Volta o status para DISPONIVEL
         if (entrega.getChave() != null) {
             Chaves chave = entrega.getChave();
             chave.setStatusChave(StatusChaveEnum.DISPONIVEL);
@@ -148,16 +152,86 @@ public class MovimentacoesService {
         return DevolucaoResponseDTO.from(entregaChavesRepo.save(entrega));
     }
 
-    // ---------------
-    // Metodos de Listagem
+    // ─────────────────────────────────────────────
+    // NOVO — Atualizar
+    // ─────────────────────────────────────────────
+
+    @Transactional
+    public MovimentacaoResponseDTO atualizar(int id, MovimentacaoUpdateDTO dto) {
+        Movimentacoes mov = movimentacoesRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Movimentação não encontrada: id=" + id));
+
+        if (!mov.isAtivo())
+            throw new IllegalStateException(
+                    "Não é possível editar uma movimentação anulada.");
+
+        Users user = getUserAutenticado();
+
+        if (dto.getObservacoes() != null)
+            mov.setObservacoes(dto.getObservacoes());
+
+        if (dto.getSetorDestino() != null)
+            mov.setSetorDestino(dto.getSetorDestino());
+
+        if (dto.getTipoVisita() != null) {
+            if (mov.getFuncionario() != null)
+                throw new IllegalArgumentException("Funcionários não têm tipo de visita.");
+            mov.setTipoVisitante(dto.getTipoVisita());
+        }
+
+        if (dto.getIdFuncionarioResponsavel() != null) {
+            if (mov.getFuncionario() != null)
+                throw new IllegalArgumentException("Funcionários não têm funcionário responsável.");
+            Funcionarios responsavel = funcionariosRepo
+                    .findById(dto.getIdFuncionarioResponsavel())
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Funcionário não encontrado: id=" + dto.getIdFuncionarioResponsavel()));
+            mov.setFuncionarioResponsavel(responsavel);
+        }
+
+        // @PreUpdate trata o modifyDate automaticamente
+        mov.setModifyUser(user.getCreateUser());
+
+        return MovimentacaoResponseDTO.from(movimentacoesRepo.save(mov));
+    }
+
+    // ─────────────────────────────────────────────
+    // NOVO — Anular (soft delete)
+    // ─────────────────────────────────────────────
+
+    @Transactional
+    public MovimentacaoResponseDTO anular(int id, String motivo) {
+        Movimentacoes mov = movimentacoesRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Movimentação não encontrada: id=" + id));
+
+        if (!mov.isAtivo())
+            throw new IllegalStateException("Esta movimentação já foi anulada.");
+
+        Users user = getUserAutenticado();
+
+        mov.setAtivo(false);
+        mov.setMotivoAnulacao(motivo);
+        mov.setDataAnulacao(LocalDateTime.now());
+        mov.setAnuladoPor(user.getCreateUser());
+        mov.setModifyUser(user.getCreateUser());
+
+        return MovimentacaoResponseDTO.from(movimentacoesRepo.save(mov));
+    }
+
+    // ─────────────────────────────────────────────
+    // Listagens
+    // ─────────────────────────────────────────────
+
     @Transactional(readOnly = true)
     public List<MovimentacaoResponseDTO> listarAtivas() {
         return movimentacoesRepo
                 .findByHoraSaidaIsNullOrderByHoraEntradaDesc()
                 .stream()
+                .filter(Movimentacoes::isAtivo)        // exclui anuladas
                 .map(m -> {
                     MovimentacaoResponseDTO dto = MovimentacaoResponseDTO.from(m);
-
                     List<EntregaPendenteDTO> pendentes = entregaChavesRepo
                             .findByMovimentacaoAndHoraDevolucaoIsNull(m)
                             .stream()
@@ -169,7 +243,6 @@ public class MovimentacoesService {
                                 return new EntregaPendenteDTO(e.getId(), descricao, tipo, e.getObservacoes());
                             })
                             .toList();
-
                     dto.setEntregasPendentes(pendentes);
                     return dto;
                 })
@@ -188,7 +261,6 @@ public class MovimentacoesService {
     public List<MovimentacaoResponseDTO> listarPorFuncionario(int idFuncionario) {
         if (!funcionariosRepo.existsById(idFuncionario))
             throw new EntityNotFoundException("Funcionário não encontrado: id=" + idFuncionario);
-
         return movimentacoesRepo.findByFuncionarioIdOrderByHoraEntradaDesc(idFuncionario)
                 .stream()
                 .map(MovimentacaoResponseDTO::from)
@@ -199,18 +271,15 @@ public class MovimentacoesService {
     public List<MovimentacaoResponseDTO> listarPorVisitante(int idVisitante) {
         if (!visitantesRepo.existsById(idVisitante))
             throw new EntityNotFoundException("Visitante não encontrado: id=" + idVisitante);
-
         return movimentacoesRepo.findByVisitanteIdOrderByHoraEntradaDesc(idVisitante)
                 .stream()
                 .map(MovimentacaoResponseDTO::from)
                 .toList();
     }
 
-    // ----------------
-    // Metodos de apoio
-    private Users getUserAutenticado() {
-        return (Users) request.getAttribute("usuarioAutenticado");
-    }
+    // ─────────────────────────────────────────────
+    // Métodos de apoio
+    // ─────────────────────────────────────────────
 
     void processarEntregaChave(Chaves chave, Movimentacoes mov, String observacoes) {
         if (chave.getStatusChave() != StatusChaveEnum.DISPONIVEL)
@@ -230,13 +299,9 @@ public class MovimentacoesService {
         entregaChavesRepo.save(entrega);
     }
 
-    // registrarEntregaChave continua igual, mas delega para o método acima
     private void registrarEntregaChave(EntregaChaveDTO entregaDTO, Movimentacoes mov) {
-        boolean jaTemChave = entregaChavesRepo
-                .existsByMovimentacaoAndHoraDevolucaoIsNull(mov);
-        if (jaTemChave)
-            throw new IllegalStateException(
-                    "Esta entrada já possui uma chave por devolver.");
+        if (entregaChavesRepo.existsByMovimentacaoAndHoraDevolucaoIsNull(mov))
+            throw new IllegalStateException("Esta entrada já possui uma chave por devolver.");
 
         Chaves chave = chavesRepo.findById(entregaDTO.getIdChave())
                 .orElseThrow(() -> new EntityNotFoundException(

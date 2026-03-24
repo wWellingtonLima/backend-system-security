@@ -3,6 +3,7 @@ package com.group1.gestao_seguranca.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -85,5 +86,6 @@ public class Funcionarios extends Pessoa {
     public void setSetor(String setor) {
         this.setor = setor;
     }
-
 }
+
+

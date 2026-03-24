@@ -1,9 +1,6 @@
 package com.group1.gestao_seguranca.controllers;
 
-import com.group1.gestao_seguranca.dto.movimentacoes.DevolucaoResponseDTO;
-import com.group1.gestao_seguranca.dto.chaves.EntregaChaveDTO;
-import com.group1.gestao_seguranca.dto.movimentacoes.MovimentacaoRequestDTO;
-import com.group1.gestao_seguranca.dto.movimentacoes.MovimentacaoResponseDTO;
+import com.group1.gestao_seguranca.dto.movimentacoes.*;
 import com.group1.gestao_seguranca.services.MovimentacoesService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -12,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+@Validated
 @RestController
 @RequestMapping("/api/movimentacoes")
 public class MovimentacoesController {
@@ -22,19 +22,22 @@ public class MovimentacoesController {
         this.service = service;
     }
 
+    // POST /api/movimentacoes/entrada
     @PostMapping("/entrada")
-    public ResponseEntity<MovimentacaoResponseDTO> registrarEntrada(@Valid @RequestBody MovimentacaoRequestDTO dto) {
+    public ResponseEntity<MovimentacaoResponseDTO> registrarEntrada(
+            @Valid @RequestBody MovimentacaoRequestDTO dto) {
         validarRequest(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(service.registrarEntrada(dto));
     }
 
+    // PATCH /api/movimentacoes/saida/{id}
     @PatchMapping("/saida/{id}")
-    public ResponseEntity<?> registrarSaida(@PathVariable int id) {
-        MovimentacaoResponseDTO response = service.registrarSaida(id);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<MovimentacaoResponseDTO> registrarSaida(
+            @PathVariable int id) {
+        return ResponseEntity.ok(service.registrarSaida(id));
     }
 
-    @Validated
+    // PATCH /api/movimentacoes/devolucao/{idEntrega}?devolvidaPor=Nome
     @PatchMapping("/devolucao/{idEntrega}")
     public ResponseEntity<DevolucaoResponseDTO> registrarDevolucao(
             @PathVariable int idEntrega,
@@ -43,10 +46,55 @@ public class MovimentacoesController {
         return ResponseEntity.ok(service.registrarDevolucao(idEntrega, devolvidaPor));
     }
 
-    // ---------
-    // Metodo apoio
+    // PATCH /api/movimentacoes/{id}
+    @PatchMapping("/{id}")
+    public ResponseEntity<MovimentacaoResponseDTO> atualizar(
+            @PathVariable int id,
+            @RequestBody @Valid MovimentacaoUpdateDTO dto) {
+        return ResponseEntity.ok(service.atualizar(id, dto));
+    }
+
+    // PATCH /api/movimentacoes/{id}/anular?motivo=...
+    @PatchMapping("/{id}/anular")
+    public ResponseEntity<MovimentacaoResponseDTO> anular(
+            @PathVariable int id,
+            @NotBlank(message = "O motivo de anulação é obrigatório")
+            @RequestParam String motivo) {
+        return ResponseEntity.ok(service.anular(id, motivo));
+    }
+
+    // GET /api/movimentacoes/ativas
+    @GetMapping("/ativas")
+    public ResponseEntity<List<MovimentacaoResponseDTO>> listarAtivas() {
+        return ResponseEntity.ok(service.listarAtivas());
+    }
+
+    // GET /api/movimentacoes
+    @GetMapping
+    public ResponseEntity<List<MovimentacaoResponseDTO>> listarTodas() {
+        return ResponseEntity.ok(service.listarTodas());
+    }
+
+    // GET /api/movimentacoes/funcionario/{id}
+    @GetMapping("/funcionario/{id}")
+    public ResponseEntity<List<MovimentacaoResponseDTO>> listarPorFuncionario(
+            @PathVariable int id) {
+        return ResponseEntity.ok(service.listarPorFuncionario(id));
+    }
+
+    // GET /api/movimentacoes/visitante/{id}
+    @GetMapping("/visitante/{id}")
+    public ResponseEntity<List<MovimentacaoResponseDTO>> listarPorVisitante(
+            @PathVariable int id) {
+        return ResponseEntity.ok(service.listarPorVisitante(id));
+    }
+
+    // ─────────────────────────────────────────────
+    // Método de apoio
+    // ─────────────────────────────────────────────
+
     private void validarRequest(MovimentacaoRequestDTO dto) {
-        boolean temVisitante = dto.getIdVisitante() != null;
+        boolean temVisitante   = dto.getIdVisitante() != null;
         boolean temFuncionario = dto.getIdFuncionario() != null;
 
         if (!temFuncionario && !temVisitante)
@@ -64,9 +112,7 @@ public class MovimentacoesController {
         if (temFuncionario && dto.getIdFuncionarioResponsavel() != null)
             throw new IllegalArgumentException("Funcionários não têm funcionário responsável");
 
-        EntregaChaveDTO entrega = dto.getEntregaChave();
-        if (entrega != null && entrega.getIdChave() == null)
+        if (dto.getEntregaChave() != null && dto.getEntregaChave().getIdChave() == null)
             throw new IllegalArgumentException("Entrega de chave requer a identificação da Chave.");
-
     }
 }

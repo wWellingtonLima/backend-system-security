@@ -21,7 +21,8 @@ public class VisitantesController {
     }
 
     @PostMapping
-    public ResponseEntity<VisitantesResponseDTO> criar(@Valid @RequestBody VisitantesRequestDTO dto) {
+    public ResponseEntity<VisitantesResponseDTO> criar(
+            @Valid @RequestBody VisitantesRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.criar(dto));
     }
 
@@ -31,12 +32,29 @@ public class VisitantesController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<VisitantesResponseDTO> buscarPorId(@PathVariable int id) {
+    public ResponseEntity<VisitantesResponseDTO> buscarPorId(
+            @PathVariable int id) {
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 
     @GetMapping("/documento/{documento}")
-    public ResponseEntity<VisitantesResponseDTO> buscarPorDocumento(@PathVariable String documento) {
+    public ResponseEntity<VisitantesResponseDTO> buscarPorDocumento(
+            @PathVariable String documento) {
         return ResponseEntity.ok(service.buscarPorDocumento(documento));
+    }
+
+    // PUT /api/visitantes/{id}
+    @PutMapping("/{id}")
+    public ResponseEntity<VisitantesResponseDTO> atualizar(
+            @PathVariable int id,
+            @Valid @RequestBody VisitantesRequestDTO dto) {
+        return ResponseEntity.ok(service.atualizar(id, dto));
+    }
+
+    // DELETE /api/visitantes/{id}
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable int id) {
+        service.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -21,6 +21,7 @@ public class Movimentacoes {
 
     @Column(name = "hora_saida")
     private LocalDateTime horaSaida;
+
     private String observacoes;
 
     @Column(name = "setor_destino", length = 30)
@@ -46,12 +47,29 @@ public class Movimentacoes {
     @OneToMany(mappedBy = "movimentacao", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<EntregaChaves> entregas;
 
+    // Anulação
+    @Column(nullable = false)
+    private boolean ativo = true;
+
+    @Column(name = "motivo_anulacao")
+    private String motivoAnulacao;
+
+    @Column(name = "data_anulacao")
+    private LocalDateTime dataAnulacao;
+
+    @Column(name = "anulado_por")
+    private String anuladoPor;
+
+    // Auditoria
     @Column(name = "create_user")
     private String createUser;
+
     @Column(name = "create_date")
     private LocalDateTime createDate;
+
     @Column(name = "modify_user")
     private String modifyUser;
+
     @Column(name = "modify_date")
     private LocalDateTime modifyDate;
 
@@ -65,131 +83,57 @@ public class Movimentacoes {
         this.modifyDate = LocalDateTime.now();
     }
 
-    public Movimentacoes() {
-    }
+    public Movimentacoes() {}
 
     public Movimentacoes(LocalDateTime horaEntrada, String observacoes, Visitantes visitante) {
         this.horaEntrada = horaEntrada;
         this.observacoes = observacoes;
-        this.visitante = visitante;
+        this.visitante   = visitante;
     }
 
     public Movimentacoes(LocalDateTime horaEntrada, String observacoes, Funcionarios funcionario) {
-        this.horaEntrada = horaEntrada;
-        this.observacoes = observacoes;
-        this.funcionario = funcionario;
+        this.horaEntrada  = horaEntrada;
+        this.observacoes  = observacoes;
+        this.funcionario  = funcionario;
     }
 
-    public TipoVisitanteEnum getTipoVisitante() {
-        return tipoVisitante;
-    }
+    // Getters e Setters existentes
+    public int getId()                              { return id; }
+    public void setId(int id)                       { this.id = id; }
+    public LocalDateTime getHoraEntrada()           { return horaEntrada; }
+    public void setHoraEntrada(LocalDateTime v)     { this.horaEntrada = v; }
+    public LocalDateTime getHoraSaida()             { return horaSaida; }
+    public void setHoraSaida(LocalDateTime v)       { this.horaSaida = v; }
+    public String getObservacoes()                  { return observacoes; }
+    public void setObservacoes(String v)            { this.observacoes = v; }
+    public String getSetorDestino()                 { return setorDestino; }
+    public void setSetorDestino(String v)           { this.setorDestino = v; }
+    public Funcionarios getFuncionario()            { return funcionario; }
+    public void setFuncionario(Funcionarios v)      { this.funcionario = v; }
+    public Visitantes getVisitante()                { return visitante; }
+    public void setVisitante(Visitantes v)          { this.visitante = v; }
+    public TipoVisitanteEnum getTipoVisitante()     { return tipoVisitante; }
+    public void setTipoVisitante(TipoVisitanteEnum v){ this.tipoVisitante = v; }
+    public Funcionarios getFuncionarioResponsavel() { return funcionarioResponsavel; }
+    public void setFuncionarioResponsavel(Funcionarios v) { this.funcionarioResponsavel = v; }
+    public List<EntregaChaves> getEntregas()        { return entregas; }
+    public void setEntregas(List<EntregaChaves> v)  { this.entregas = v; }
+    public String getCreateUser()                   { return createUser; }
+    public void setCreateUser(String v)             { this.createUser = v; }
+    public LocalDateTime getCreateDate()            { return createDate; }
+    public void setCreateDate(LocalDateTime v)      { this.createDate = v; }
+    public String getModifyUser()                   { return modifyUser; }
+    public void setModifyUser(String v)             { this.modifyUser = v; }
+    public LocalDateTime getModifyDate()            { return modifyDate; }
+    public void setModifyDate(LocalDateTime v)      { this.modifyDate = v; }
 
-    public void setTipoVisitante(TipoVisitanteEnum tipoVisitante) {
-        this.tipoVisitante = tipoVisitante;
-    }
-
-    public Funcionarios getFuncionarioResponsavel() {
-        return funcionarioResponsavel;
-    }
-
-    public void setFuncionarioResponsavel(Funcionarios funcionarioResponsavel) {
-        this.funcionarioResponsavel = funcionarioResponsavel;
-    }
-
-    public String getSetorDestino() {
-        return setorDestino;
-    }
-
-    public void setSetorDestino(String setorDestino) {
-        this.setorDestino = setorDestino;
-    }
-
-    public List<EntregaChaves> getEntregas() {
-        return entregas;
-    }
-
-    public void setEntregas(List<EntregaChaves> entregas) {
-        this.entregas = entregas;
-    }
-
-    public Visitantes getVisitante() {
-        return visitante;
-    }
-
-    public void setVisitante(Visitantes visitante) {
-        this.visitante = visitante;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getHoraEntrada() {
-        return horaEntrada;
-    }
-
-    public void setHoraEntrada(LocalDateTime horaEntrada) {
-        this.horaEntrada = horaEntrada;
-    }
-
-    public LocalDateTime getHoraSaida() {
-        return horaSaida;
-    }
-
-    public void setHoraSaida(LocalDateTime horaSaida) {
-        this.horaSaida = horaSaida;
-    }
-
-    public String getObservacoes() {
-        return observacoes;
-    }
-
-    public void setObservacoes(String observacoes) {
-        this.observacoes = observacoes;
-    }
-
-    public Funcionarios getFuncionario() {
-        return funcionario;
-    }
-
-    public void setFuncionario(Funcionarios funcionario) {
-        this.funcionario = funcionario;
-    }
-
-
-    public String getCreateUser() {
-        return createUser;
-    }
-
-    public void setCreateUser(String createUser) {
-        this.createUser = createUser;
-    }
-
-    public LocalDateTime getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(LocalDateTime createDate) {
-        this.createDate = createDate;
-    }
-
-    public String getModifyUser() {
-        return modifyUser;
-    }
-
-    public void setModifyUser(String modifyUser) {
-        this.modifyUser = modifyUser;
-    }
-
-    public LocalDateTime getModifyDate() {
-        return modifyDate;
-    }
-
-    public void setModifyDate(LocalDateTime modifyDate) {
-        this.modifyDate = modifyDate;
-    }
+    // Getters e Setters anulação
+    public boolean isAtivo()                        { return ativo; }
+    public void setAtivo(boolean v)                 { this.ativo = v; }
+    public String getMotivoAnulacao()               { return motivoAnulacao; }
+    public void setMotivoAnulacao(String v)         { this.motivoAnulacao = v; }
+    public LocalDateTime getDataAnulacao()          { return dataAnulacao; }
+    public void setDataAnulacao(LocalDateTime v)    { this.dataAnulacao = v; }
+    public String getAnuladoPor()                   { return anuladoPor; }
+    public void setAnuladoPor(String v)             { this.anuladoPor = v; }
 }

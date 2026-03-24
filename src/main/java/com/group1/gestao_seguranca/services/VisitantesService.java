@@ -33,12 +33,12 @@ public class VisitantesService {
 
     @Transactional
     public VisitantesResponseDTO criar(VisitantesRequestDTO dto) {
-        Users user = getUserAutenticado();
-
         if (visitantesRepo.existsByDocumentoIdentificacao(dto.getDocumentoIdentificacao())) {
             throw new IllegalStateException(
                     "Já existe um visitante com o documento: " + dto.getDocumentoIdentificacao());
         }
+
+        Users user = getUserAutenticado();
 
         Visitantes visitante = new Visitantes();
         visitante.setNomeVisitante(dto.getNomeVisitante());
@@ -68,5 +68,36 @@ public class VisitantesService {
         return visitantesRepo.findByDocumentoIdentificacao(documento)
                 .map(VisitantesResponseDTO::from)
                 .orElseThrow(() -> new EntityNotFoundException("Visitante não encontrado: doc=" + documento));
+    }
+
+    @Transactional
+    public VisitantesResponseDTO atualizar(int id, VisitantesRequestDTO dto) {
+        Visitantes visitante = visitantesRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Visitante não encontrado: id=" + id));
+
+        // Se o documento mudou, verifica se já existe noutro visitante
+        if (!visitante.getDocumentoIdentificacao().equals(dto.getDocumentoIdentificacao())
+                && visitantesRepo.existsByDocumentoIdentificacao(dto.getDocumentoIdentificacao())) {
+            throw new IllegalStateException(
+                    "Já existe um visitante com o documento: " + dto.getDocumentoIdentificacao());
+        }
+
+        Users user = getUserAutenticado();
+
+        visitante.setNomeVisitante(dto.getNomeVisitante());
+        visitante.setDocumentoIdentificacao(dto.getDocumentoIdentificacao());
+        visitante.setEmpresa(dto.getEmpresa());
+        visitante.setObservacoes(dto.getObservacoes());
+        visitante.setModifyDate(LocalDateTime.now());
+        visitante.setModifyUser(user.getCreateUser());
+
+        return VisitantesResponseDTO.from(visitantesRepo.save(visitante));
+    }
+
+    @Transactional
+    public void eliminar(int id) {
+        if (!visitantesRepo.existsById(id))
+            throw new EntityNotFoundException("Visitante não encontrado: id=" + id);
+        visitantesRepo.deleteById(id);
     }
 }

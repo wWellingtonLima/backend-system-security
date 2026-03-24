@@ -17,7 +17,6 @@ import java.util.List;
 public class FuncionariosService {
 
     private final FuncionariosRepository funcionariosRepo;
-
     private final HttpServletRequest request;
 
     public FuncionariosService(FuncionariosRepository funcionariosRepo, HttpServletRequest request) {
@@ -25,11 +24,9 @@ public class FuncionariosService {
         this.request = request;
     }
 
-    // Metodo auxilar Obter usuario
     private Users getUserAutenticado() {
         return (Users) request.getAttribute("usuarioAutenticado");
     }
-
 
     @Transactional
     public FuncionariosResponseDTO criar(FuncionariosRequestDTO dto) {
@@ -75,4 +72,34 @@ public class FuncionariosService {
                 .map(FuncionariosResponseDTO::from)
                 .toList();
     }
+
+    @Transactional
+    public FuncionariosResponseDTO atualizar(int id, FuncionariosRequestDTO dto) {
+        Funcionarios funcionario = funcionariosRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado: id=" + id));
+
+        if (!funcionario.getNumeroFuncionario().equals(dto.getNumeroFuncionario())
+                && funcionariosRepo.existsByNumeroFuncionario(dto.getNumeroFuncionario())) {
+            throw new IllegalStateException(
+                    "Já existe um funcionário com o número: " + dto.getNumeroFuncionario());
+        }
+
+        Users user = getUserAutenticado();
+
+        funcionario.setNomeFuncionario(dto.getNomeFuncionario());
+        funcionario.setNumeroFuncionario(dto.getNumeroFuncionario());
+        funcionario.setSetor(dto.getSetor());
+        funcionario.setModifyDate(LocalDateTime.now());
+        funcionario.setModifyUser(user.getCreateUser());
+
+        return FuncionariosResponseDTO.from(funcionariosRepo.save(funcionario));
+    }
+
+    @Transactional
+    public void eliminar(int id) {
+        if (!funcionariosRepo.existsById(id))
+            throw new EntityNotFoundException("Funcionário não encontrado: id=" + id);
+        funcionariosRepo.deleteById(id);
+    }
+
 }

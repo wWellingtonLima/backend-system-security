@@ -2,6 +2,7 @@ package com.group1.gestao_seguranca.entities;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -85,5 +86,4 @@ public class Visitantes extends Pessoa {
     public void setDocumentoIdentificacao(String documentoIdentificacao) {
         this.documentoIdentificacao = documentoIdentificacao;
     }
-
 }

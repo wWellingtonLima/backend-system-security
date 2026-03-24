@@ -21,7 +21,8 @@ public class FuncionariosController {
     }
 
     @PostMapping
-    public ResponseEntity<FuncionariosResponseDTO> criar(@Valid @RequestBody FuncionariosRequestDTO dto) {
+    public ResponseEntity<FuncionariosResponseDTO> criar(
+            @Valid @RequestBody FuncionariosRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.criar(dto));
     }
 
@@ -31,17 +32,35 @@ public class FuncionariosController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FuncionariosResponseDTO> buscarPorId(@PathVariable int id) {
+    public ResponseEntity<FuncionariosResponseDTO> buscarPorId(
+            @PathVariable int id) {
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 
     @GetMapping("/numero/{numero}")
-    public ResponseEntity<FuncionariosResponseDTO> buscarPorNumero(@PathVariable String numero) {
+    public ResponseEntity<FuncionariosResponseDTO> buscarPorNumero(
+            @PathVariable String numero) {
         return ResponseEntity.ok(service.buscarPorNumero(numero));
     }
 
     @GetMapping("/setor/{setor}")
-    public ResponseEntity<List<FuncionariosResponseDTO>> buscarPorSetor(@PathVariable String setor) {
+    public ResponseEntity<List<FuncionariosResponseDTO>> buscarPorSetor(
+            @PathVariable String setor) {
         return ResponseEntity.ok(service.buscarPorSetor(setor));
+    }
+
+    // PUT /api/funcionarios/{id}
+    @PutMapping("/{id}")
+    public ResponseEntity<FuncionariosResponseDTO> atualizar(
+            @PathVariable int id,
+            @Valid @RequestBody FuncionariosRequestDTO dto) {
+        return ResponseEntity.ok(service.atualizar(id, dto));
+    }
+
+    // DELETE /api/funcionarios/{id}
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable int id) {
+        service.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
 }
