@@ -50,7 +50,7 @@ public class ListagensController {
     }
 
     // Histórico completo
-    @GetMapping("/movimentacoes")
+    @GetMapping("/movimentacoes/todas")
     public ResponseEntity<List<MovimentacaoResponseDTO>> listarTodas() {
         return ResponseEntity.ok(service.listarTodas());
     }
