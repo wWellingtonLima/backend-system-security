@@ -1,4 +1,4 @@
-package com.group1.gestao_seguranca.dto.movimentacoes;
+package com.group1.gestao_seguranca.dto.chaves;
 
 public class EntregaChaveDTO {
     private Integer idChave;
