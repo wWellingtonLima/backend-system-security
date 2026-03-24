@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -22,7 +23,6 @@ public class BuscaController {
     public BuscaController(BuscaService service) {
         this.service = service;
     }
-
     // GET /api/busca/funcionarios?nome=jo
     @GetMapping("/funcionarios")
     public ResponseEntity<List<FuncionarioBuscaDTO>> funcionarios(
@@ -39,6 +39,28 @@ public class BuscaController {
         if (nome.isBlank() || nome.length() < 2)
             return ResponseEntity.ok(List.of());
         return ResponseEntity.ok(service.buscarVisitantes(nome));
+    }
+
+// GET /api/busca?nome=jo
+    public record BuscaGeralDTO(Integer id, String nome, TipoPessoa tipo) {}
+    public enum TipoPessoa { FUNCIONARIO, VISITANTE }
+
+    @GetMapping
+    public ResponseEntity<List<BuscaGeralDTO>> buscar(@RequestParam String nome) {
+        if (nome.isBlank() || nome.length() < 2)
+            return ResponseEntity.ok(List.of());
+
+        List<BuscaGeralDTO> resultado = new ArrayList<>();
+
+        service.buscarFuncionarios(nome).stream()
+                .map(f -> new BuscaGeralDTO(f.id(), f.nomeFuncionario(), TipoPessoa.FUNCIONARIO))
+                .forEach(resultado::add);
+
+        service.buscarVisitantes(nome).stream()
+                .map(v -> new BuscaGeralDTO(v.id(), v.nomeVisitante(), TipoPessoa.VISITANTE))
+                .forEach(resultado::add);
+
+        return ResponseEntity.ok(resultado);
     }
 
     // GET /api/busca/chaves?q=CHV
